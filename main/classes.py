@@ -37,8 +37,13 @@ class Commutators:
 
     def do_things(self):
         # does the things
-        # for item in self.network:
-        pass
+        for item in self.network:
+            if not item.is_connected_to_root():
+                item.remove()
+            else:
+                for port in item.get_all_ports():
+                    if item.get_endpoint_by_port(port) != self.root_number:
+                        item.drop(port)
 
     def is_connected_to_root(self, device_number):
         # checks if device number is connected to root device
@@ -60,7 +65,7 @@ class Device:
         in_string = 'Commutator #' + str(self.number) + '\n'
         for item in self.data:
             in_string += '\troutes to #' + str(item[0]) + \
-                         ' \tover port #' + str(item[1]) + '\n'
+                         '\tover port #' + str(item[1]) + '\n'
         if self.is_root:
             in_string += '\t----ROOT----\n'
         return in_string
@@ -75,6 +80,9 @@ class Device:
         else:
             return False
 
+    def get_own_number(self):
+        return self.number
+
     def set_root(self):
         self.is_root = True
 
@@ -87,6 +95,9 @@ class Device:
         for item in self.data:
             if item[1] == port:
                 return item[0]
+
+    def get_all_ports(self):
+        return [item[1] for item in self.data]
 
     def drop(self, port):
         # closes the port given
