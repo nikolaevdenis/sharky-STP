@@ -10,7 +10,9 @@ test_commutators = []
 for i in range(10):
     test_commutators.append(Commutator(i, i, i))
     for j in range(10):
-        test_commutators[i].append(randint(0, 10), 1)
+        test_commutators[i].append(j, j)
 
 for commutator in test_commutators:
     print (commutator)
+
+print (test_commutators[0].is_connected(5))
