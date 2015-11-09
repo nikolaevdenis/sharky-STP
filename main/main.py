@@ -4,6 +4,10 @@ Main file handles input and output of the program, also handles main working pro
 
 # imports
 from classes import Commutator
+from random import randint
 
-test_commutator = Commutator(2, 80, 1)
-print (test_commutator)
+test_commutators = Commutator(1, 1, 1)
+for i in range(10):
+    test_commutators.append(randint(0, 10), randint(0, 100))
+
+print (test_commutators)
