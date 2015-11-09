@@ -6,8 +6,11 @@ Main file handles input and output of the program, also handles main working pro
 from classes import Commutator
 from random import randint
 
-test_commutators = Commutator(1, 1, 1)
+test_commutators = []
 for i in range(10):
-    test_commutators.append(randint(0, 10), randint(0, 100))
+    test_commutators.append(Commutator(i, i, i))
+    for j in range(10):
+        test_commutators[i].append(randint(0, 10), 1)
 
-print (test_commutators)
+for commutator in test_commutators:
+    print (commutator)

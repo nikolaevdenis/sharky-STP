@@ -8,7 +8,8 @@ class Commutator:
         self.data = [(endpoint, port)]
         self.number = own_number
     def append(self, endpoint, port):
-        self.data.append((endpoint, port))
+        if all(item[1] != port for item in self.data):
+            self.data.append((endpoint, port))
     def __str__(self):
         in_string = 'Commutator #' + str(self.number) + '\n'
         for item in self.data:
