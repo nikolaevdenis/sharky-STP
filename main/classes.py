@@ -37,17 +37,17 @@ class Commutators:
 
     def do_things(self):
         # does the things
-        for item in self.network:
-            if not item.is_connected_to_root():
-                item.remove()
+        for i in range(len(self.network)):
+            if self.is_connected_to_root(i) == False:
+                del self.network[i]
             else:
-                for port in item.get_all_ports():
-                    if item.get_endpoint_by_port(port) != self.root_number:
-                        item.drop(port)
+                for port in self.network[i].get_all_ports():
+                    if self.network[i].get_endpoint_by_port(port) != self.root_number:
+                        self.network[i].drop(port)
 
     def is_connected_to_root(self, device_number):
         # checks if device number is connected to root device
-        self.network[device_number].is_connected(device_number, self.root_number)
+        self.network[device_number].is_connected(self.root_number)
 
 class Device:
 
