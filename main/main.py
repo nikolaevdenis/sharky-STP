@@ -16,3 +16,5 @@ for i in range(10):
 # print ('--DEBUG--')
 # for commutator in test_commutators:
 #     print (commutator)
+
+# main algorithm
