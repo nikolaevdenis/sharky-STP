@@ -27,6 +27,9 @@ class Commutators:
     def tag_root(self, device_number):
         self.network[device_number].set_root()
 
+    def drop_connection(self, device_number, port):
+        self.network[device_number].drop(port)
+
 class Device:
 
     def __init__(self, endpoint, port, own_number):
@@ -60,3 +63,17 @@ class Device:
 
     def set_root(self):
         self.is_root = True
+
+    def get_port_by_endpoint(self, endpoint):
+        for item in self.data:
+            if item[0] == endpoint:
+                return item[1]
+
+    def get_endpoint_by_port(self, port):
+        for item in self.data:
+            if item[1] == port:
+                return item[0]
+
+    def drop(self, port):
+        endpoint = self.get_endpoint_by_port(port)
+        self.data.remove((endpoint, port))
