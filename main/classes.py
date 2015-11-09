@@ -1,6 +1,8 @@
 """
 classes file implies all classes, which will be used in current program
 """
+from random import randint
+
 class Commutators:
 
     def __init__(self, max):
@@ -8,7 +10,7 @@ class Commutators:
         for i in range(max):
             self.network.append(Device(0, 0, i))
             for j in range(max):
-                self.network[i].append(j, j)
+                self.network[i].append(randint(0, j), randint(0, j))
 
     def __str__(self):
         in_string = ''
@@ -34,7 +36,7 @@ class Device:
         self.is_root = False
 
     def append(self, endpoint, port):
-        if all(item[1] != port for item in self.data):
+        if all(item[0] != endpoint for item in self.data) and all(item[1] != port for item in self.data):
             self.data.append((endpoint, port))
 
     def __str__(self):
