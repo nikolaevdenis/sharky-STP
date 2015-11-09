@@ -1,8 +1,23 @@
 """
 classes file implies all classes, which will be used in current program
 """
+class Commutators:
 
-class Commutator:
+    def __init__(self, max):
+        self.network = []
+        for i in range(max):
+            self.network.append(Device(0, 0, i))
+            for j in range(max):
+                self.network[i].append(j, j)
+
+    def __str__(self):
+        in_string = ''
+        for item in self.network:
+            in_string += str(item) + '\n'
+        return in_string
+
+class Device:
+
     def __init__(self, endpoint, port, own_number):
         # commutator is performed as list of tuples (endpoint, port used)
         self.data = [(endpoint, port)]
@@ -28,3 +43,4 @@ class Commutator:
                 return item[1]
         else:
             return False
+
