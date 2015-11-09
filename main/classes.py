@@ -6,7 +6,9 @@ from random import randint
 class Commutators:
 
     def __init__(self, max):
+        # creates random network
         self.network = []
+        self.root_number = None
         for i in range(max):
             self.network.append(Device(0, 0, i))
             for j in range(max):
@@ -25,10 +27,22 @@ class Commutators:
         return self.network[startpoint].is_connected(endpoint)
 
     def tag_root(self, device_number):
+        # tags the device as root, remember the root device number
         self.network[device_number].set_root()
+        self.root_number = device_number
 
     def drop_connection(self, device_number, port):
+        # closes the port on device
         self.network[device_number].drop(port)
+
+    def do_things(self):
+        # does the things
+        # for item in self.network:
+        pass
+
+    def is_connected_to_root(self, device_number):
+        # checks if device number is connected to root device
+        self.network[device_number].is_connected(device_number, self.root_number)
 
 class Device:
 
@@ -75,5 +89,6 @@ class Device:
                 return item[0]
 
     def drop(self, port):
+        # closes the port given
         endpoint = self.get_endpoint_by_port(port)
         self.data.remove((endpoint, port))
