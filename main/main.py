@@ -10,6 +10,8 @@ from classes import Device
 
 the_network = Commutators(10)
 
-the_network.tag_root(9)
-print (the_network)
+# ---DEBUG---
+# the_network.tag_root(9)
+# print (the_network)
 # print (the_network.is_connected(1, 9))
+
