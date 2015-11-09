@@ -16,6 +16,12 @@ class Commutators:
             in_string += str(item) + '\n'
         return in_string
 
+    def is_connected(self, startpoint, endpoint):
+        # checks if the startpoint commutator is connected to endpoint
+        # if yes, returns a connection port
+        # if no, returns False
+        return self.network[startpoint].is_connected(endpoint)
+
 class Device:
 
     def __init__(self, endpoint, port, own_number):
@@ -43,4 +49,3 @@ class Device:
                 return item[1]
         else:
             return False
-
