@@ -22,12 +22,16 @@ class Commutators:
         # if no, returns False
         return self.network[startpoint].is_connected(endpoint)
 
+    def tag_root(self, device_number):
+        self.network[device_number].set_root()
+
 class Device:
 
     def __init__(self, endpoint, port, own_number):
         # commutator is performed as list of tuples (endpoint, port used)
         self.data = [(endpoint, port)]
         self.number = own_number
+        self.is_root = False
 
     def append(self, endpoint, port):
         if all(item[1] != port for item in self.data):
@@ -38,6 +42,8 @@ class Device:
         for item in self.data:
             in_string += '\troutes to #' + str(item[0]) + \
                          ' \tover port #' + str(item[1]) + '\n'
+        if self.is_root:
+            in_string += '\t----ROOT----\n'
         return in_string
 
     def is_connected(self, endpoint):
@@ -49,3 +55,6 @@ class Device:
                 return item[1]
         else:
             return False
+
+    def set_root(self):
+        self.is_root = True
