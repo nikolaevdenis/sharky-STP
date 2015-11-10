@@ -12,14 +12,15 @@ class Network:
         # for i in range(max):
         #     self.network.append(Device(0, 0, i, False))
         #     for j in range(max):
-        #         self.network[i].append(randint(0, j), randint(0, j))
+        #         self.network[i].append(randint(0, j), randint(0, j), False)
         self.network.append(Device(1, 1, 0, False))
         self.network[0].append(2, 2, False)
         self.network[0].append(3, 3, False)
         self.network.append(Device(0, 0, 1, False))
         self.network.append(Device(0, 0, 2, False))
         self.network.append(Device(0, 0, 3, False))
-
+        self.network.append(Device(3, 0, 4, False))
+        self.network[3].append(4, 4, False)
 
     def __str__(self):
         in_string = ''
@@ -69,27 +70,30 @@ class Network:
             node_list.append(10000)
 
         node_list[startpoint] = 0
-
         device_number = startpoint
+        depth_level = 0
+        for device_number, value in enumerate(node_list):
+            if value == depth_level:
+                if device_number != endpoint:
+                    if node_list[device_number] == depth_level:
+                        current_device = network[device_number]
+                        current_device_connections = current_device.get_connections()
+                        print('current_device', str(device_number), 'current_device_connections', str(current_device_connections))
+                        for connection in current_device_connections:
+                            if node_list[connection] >= 1 + node_list[device_number]:
+                                node_list[connection] = node_list[device_number] + 1
 
-        while device_number != endpoint:
-
-            current_device = network[device_number]
-            current_device_connections = current_device.get_connections()
-            print('current_device', str(device_number), 'current_device_connections', str(current_device_connections))
-            for connection in current_device_connections:
-                if node_list[connection] >= 1 + node_list[device_number]:
-                    node_list[connection] = node_list[device_number] + 1
-
-                # drop connections to current device not to go back
-                # first, get the object of connected device
-                connected_device_port = network[connection].get_port_by_endpoint(device_number)
-                # drop connection to connected device
-                print (connection, connected_device_port)
-                network[connection].drop(connected_device_port)
-                print (str(network[device_number]))
-
-            device_number += 1
+                            # drop connections to current device not to go back
+                            # first, get the object of connected device
+                            connected_device_port = network[connection].get_port_by_endpoint(device_number)
+                            # drop connection to connected device
+                            print (connection, connected_device_port)
+                            network[connection].drop(connected_device_port)
+                            # print (str(network[device_number]))
+                    depth_level = node_list[connection]
+                    device_number
+                else: break
+        print ('Path', depth_level)
 
 class Device:
 

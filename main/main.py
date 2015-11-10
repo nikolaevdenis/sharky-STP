@@ -26,5 +26,5 @@ if __name__=='__main__':
     # ---DEBUG---
     # the_network.tag_root(9)
     print (the_network)
-    the_network.dijkstra(0, 3)
+    the_network.dijkstra(0, 4)
     # print (the_network)
