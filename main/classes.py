@@ -9,18 +9,20 @@ class Network:
         # creates random network
         self.network = []
         self.root_number = None
-        # for i in range(max):
-        #     self.network.append(Device(0, 0, i, False))
-        #     for j in range(max):
-        #         self.network[i].append(randint(0, j), randint(0, j), False)
-        self.network.append(Device(1, 1, 0, False))
-        self.network[0].append(2, 2, False)
-        self.network[0].append(3, 3, False)
-        self.network.append(Device(0, 0, 1, False))
-        self.network.append(Device(0, 0, 2, False))
-        self.network.append(Device(0, 0, 3, False))
-        self.network.append(Device(3, 0, 4, False))
-        self.network[3].append(4, 4, False)
+        for i in range(max):
+            self.network.append(Device(i))
+            for j in range(max):
+                target = randint(0, max-1)
+                if target != i:
+                    self.network[i].append(randint(0, max-1), randint(0, max-1), False)
+        # self.network.append(Device(1, 1, 0, False))
+        # self.network[0].append(2, 2, False)
+        # self.network[0].append(3, 3, False)
+        # self.network.append(Device(0, 0, 1, False))
+        # self.network.append(Device(0, 0, 2, False))
+        # self.network.append(Device(0, 0, 3, False))
+        # self.network.append(Device(3, 0, 4, False))
+        # self.network[3].append(4, 4, False)
 
     def __str__(self):
         in_string = ''
@@ -87,23 +89,30 @@ class Network:
                             # first, get the object of connected device
                             connected_device_port = network[connection].get_port_by_endpoint(device_number)
                             # drop connection to connected device
-                            print (connection, connected_device_port)
-                            network[connection].drop(connected_device_port)
+                            print ('Backwards Connection', connection, 'Connected device port', connected_device_port)
+                            if connected_device_port:
+                                network[connection].drop(connected_device_port)
                             # print (str(network[device_number]))
                     depth_level = node_list[connection]
-                    device_number
                 else: break
         print ('Path', depth_level)
 
 class Device:
 
-    def __init__(self, endpoint, port, own_number, root_flag):
+    def __init__(self, own_number, endpoint = None, port = None, root_flag = False):
         # commutator is performed as list of tuples (endpoint, port used)
-        self.data = [[endpoint, port, root_flag]]
+        print("Creating device " + str(own_number) + " with following parameters: ")
+        print(endpoint, port, root_flag)
+        if endpoint and port:
+            self.data = [[endpoint, port, root_flag]]
+        else:
+            self.data = []
+        print("this device has connections: " + str(self.data))
         self.number = own_number
         self.is_root = False
 
     def append(self, endpoint, port, root_flag):
+        # if connection is unique - add
         if all(item[0] != endpoint for item in self.data) and all(item[1] != port for item in self.data):
             self.data.append([endpoint, port, root_flag])
 
@@ -140,6 +149,7 @@ class Device:
         for item in self.data:
             if item[0] == endpoint:
                 return item[1]
+        return False
 
     def get_endpoint_by_port(self, port):
         for item in self.data:
@@ -151,5 +161,8 @@ class Device:
 
     def drop(self, port):
         # closes the port given
-        endpoint = self.get_endpoint_by_port(port)
-        self.data.remove([endpoint, port, False])
+        try:
+            endpoint = self.get_endpoint_by_port(port)
+            self.data.remove([endpoint, port, False])
+        except:
+            return False
