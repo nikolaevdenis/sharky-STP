@@ -66,10 +66,11 @@ class Network:
         start_device = network[startpoint]
 
         node_list = []
-
+        path_list = []
         for device in network:
             # set incredibly length!
             node_list.append(10000)
+            path_list.append(0)
 
         node_list[startpoint] = 0
         device_number = startpoint
@@ -84,7 +85,7 @@ class Network:
                         for connection in current_device_connections:
                             if node_list[connection] >= 1 + node_list[device_number]:
                                 node_list[connection] = node_list[device_number] + 1
-
+                                path_list[connection] = device_number
                             # drop connections to current device not to go back
                             # first, get the object of connected device
                             connected_device_port = network[connection].get_port_by_endpoint(device_number)
@@ -95,8 +96,11 @@ class Network:
                             # print (str(network[device_number]))
                     depth_level = node_list[connection]
                 else: break
-        print ('Path', depth_level)
 
+        while connection != startpoint:
+            print ('Current device number = ', connection, 'Previous = ', path_list[connection])
+            connection = path_list[connection]
+        print ('Path', depth_level)
 class Device:
 
     def __init__(self, own_number, endpoint = None, port = None, root_flag = False):
