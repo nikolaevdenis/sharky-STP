@@ -3,16 +3,27 @@ classes file implies all classes, which will be used in current program
 """
 from random import randint
 
-class Commutators:
+class Network:
 
     def __init__(self, max):
         # creates random network
         self.network = []
         self.root_number = None
         for i in range(max):
-            self.network.append(Device(0, 0, i))
+            self.network.append(Device(i))
             for j in range(max):
-                self.network[i].append(randint(0, j), randint(0, j))
+                target = randint(0, max-1)
+                if target != i:
+                    self.network[i].append(randint(0, max-1), randint(0, max-1), False)
+        # self.network.append(Device(1, 1, 0, False))
+        # self.network[0].append(2, 2, False)
+        # self.network[0].append(3, 3, False)
+        # self.network.append(Device(0, 0, 1, False))
+        # self.network.append(Device(0, 0, 2, False))
+        # self.network.append(Device(0, 0, 3, False))
+        # self.network.append(Device(3, 0, 4, False))
+        # self.network[3].append(4, 4, False)
+        self.reference_network = self.network[:]
 
     def __str__(self):
         in_string = ''
@@ -49,17 +60,97 @@ class Commutators:
         # checks if device number is connected to root device
         self.network[device_number].is_connected(self.root_number)
 
+    def dijkstra(self, startpoint, endpoint):
+
+        network = self.network[:]
+        print ('Starting djikstra for ', startpoint, 'to', endpoint)
+        start_device = network[startpoint]
+
+        node_list = []
+        path_list = []
+        for device in network:
+            # set incredibly length!
+            node_list.append(10000)
+            path_list.append('')
+
+        node_list[startpoint] = 0
+        device_number = startpoint
+        depth_level = 0
+        connection = 0
+        for device_number, value in enumerate(node_list):
+            print ('Depth level', depth_level)
+            if value == depth_level:
+                if device_number != endpoint:
+                    print ('Current device_number', device_number)
+                    if node_list[device_number] == depth_level:
+                        current_device = network[device_number]
+                        current_device_connections = current_device.get_connections()
+                        # print('current_device', str(device_number), 'current_device_connections', str(current_device_connections))
+                        for connection in current_device_connections:
+                            if node_list[connection] >= 1 + node_list[device_number]:
+                                print ('Found a close one', connection)
+                                node_list[connection] = node_list[device_number] + 1
+                                path_list[connection] = device_number
+                                depth_level = node_list[connection]
+                            # drop connections to current device not to go back
+                            # first, get the object of connected device
+                            connected_device_port = network[connection].get_port_by_endpoint(device_number)
+                            # drop connection to connected device
+                            # print ('Backwards Connection', connection, 'Connected device port', connected_device_port)
+                            if connected_device_port:
+                                network[connection].drop(connected_device_port)
+                            # print (str(network[device_number]))
+                    # depth_level = node_list[connection]
+                else:
+                    break()
+
+        connection = endpoint
+
+        while connection != startpoint:
+            # print ('Current device number = ', connection, 'Previous = ', path_list[connection])
+            previous_device = path_list[connection]
+            if previous_device != '':
+                # root_port = self.network[previous_device].get_port_by_endpoint(self.network[connection])
+                # self.network[previous_device].flag_port(root_port)
+                print ('DROPPING PORTS FOR DEVICE #' + str(previous_device))
+                # self.network[previous_device].drop_non_root_ports()
+                self.network[previous_device].drop_all_by_endpoint(connection)
+                connection = previous_device
+            else:
+                break
+        # print ('Path', depth_level)
+
+    def STP(self, root):
+        for device_number, device in enumerate(self.network):
+            # print("################## NEW STP ITERATION, DEVICE NUMBER == " + str(device_number))
+            self.dijkstra(device_number, root)
+            break
+        # for device in self.network:
+        #     device.drop_non_root_ports()
+
+
 class Device:
 
-    def __init__(self, endpoint, port, own_number):
+    def __init__(self, own_number, endpoint = None, port = None, root_flag = False):
         # commutator is performed as list of tuples (endpoint, port used)
-        self.data = [(endpoint, port)]
+        # print("Creating device " + str(own_number) + " with following parameters: ")
+        # print(endpoint, port, root_flag)
+        if endpoint and port:
+            self.data = [[endpoint, port, root_flag]]
+        else:
+            self.data = []
+        # print("this device has connections: " + str(self.data))
         self.number = own_number
         self.is_root = False
 
-    def append(self, endpoint, port):
-        if all(item[0] != endpoint for item in self.data) and all(item[1] != port for item in self.data):
-            self.data.append((endpoint, port))
+    def append(self, endpoint, port, root_flag):
+        # if connection is unique - add
+        if all(item[0] != endpoint for item in self.data) and all(item[1] != port for item in self.data) and endpoint != self.number:
+            self.data.append([endpoint, port, root_flag])
+
+    def get_connections(self):
+        # returns all connected nodes as destination node numbers
+        return [connection[0] for connection in self.data]
 
     def __str__(self):
         in_string = 'Commutator #' + str(self.number) + '\n'
@@ -90,6 +181,7 @@ class Device:
         for item in self.data:
             if item[0] == endpoint:
                 return item[1]
+        return False
 
     def get_endpoint_by_port(self, port):
         for item in self.data:
@@ -99,7 +191,30 @@ class Device:
     def get_all_ports(self):
         return [item[1] for item in self.data]
 
-    def drop(self, port):
+    def drop(self, port, endpoint = False):
         # closes the port given
-        endpoint = self.get_endpoint_by_port(port)
-        self.data.remove((endpoint, port))
+        if not endpoint:
+            endpoint = self.get_endpoint_by_port(port)
+        # print ('Kill connection on device #', self.number, 'endpoint:', endpoint, 'port', port)
+        self.data.remove([endpoint, port, False])
+        # try:
+        #     endpoint = self.get_endpoint_by_port(port)
+        #     self.data.remove([endpoint, port, False])
+        # except:
+        #     print ('Cannot drop port #', port, 'on device #', self.number)
+    def drop_all_by_endpoint(self, endpoint):
+        for item in self.data:
+            if item[0] != endpoint:
+                self.drop(item[1], item[0])
+
+    def flag_port(self, port):
+        for item in self.data:
+            if item[1] == port:
+                item[2] = True
+                break
+
+    def drop_non_root_ports(self):
+        for item in self.data:
+            if not item[2]:
+                print ('On device ' + str(self.number) + ' Dropping port ' + str(item[1]) + ' Routing to ' + str(item[0]) + ' ' + str(item[2]))
+                self.drop(item[1])
