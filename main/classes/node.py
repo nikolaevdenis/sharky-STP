@@ -52,7 +52,7 @@ class Node:
 
         for connection in self.connections:
             if connection.get_connected_to() == target:
-                return True
+                return connection.get_port()
         else:
             return False
 

@@ -1,4 +1,5 @@
-import node
+from node import Node
+from random import randint
 
 class Network:
 
@@ -6,33 +7,33 @@ class Network:
         # creates random network
         self.network = []
         self.root_number = None
-        for i in range(max):
-            self.network.append(Node(i))
+        for node in range(max):
+            self.network.append(Node(node))
             for j in range(max):
                 target = randint(0, max-1)
-                if target != i:
-                    self.network[i].append(randint(0, max-1), randint(0, max-1), False)
+                if target != node:
+                    self.network[node].append(randint(0, max-1), randint(0, max-1))
 
     def __str__(self):
         in_string = ''
-        for item in self.network:
-            in_string += str(item) + '\n'
+        for node in self.network:
+            in_string += str(node) + '\n'
         return in_string
 
-    def is_connected(self, startpoint, endpoint):
+    def is_connected(self, self_number, target):
         # checks if the startpoint commutator is connected to endpoint
         # if yes, returns a connection port
         # if no, returns False
-        return self.network[startpoint].is_connected(endpoint)
+        return self.network[self_number].is_connected_to(target)
 
-    def tag_root(self, device_number):
+    def tag_root(self, self_number):
         # tags the device as root, remember the root device number
-        self.network[device_number].set_root()
-        self.root_number = device_number
+        self.network[self_number].set_root()
+        self.root_number = self_number
 
-    def drop_connection(self, device_number, port):
+    def drop_connection(self, self_number, port):
         # closes the port on device
-        self.network[device_number].drop(port)
+        self.network[self_number].drop_by_port(port)
 
     def do_things(self):
         # does the things
@@ -44,9 +45,9 @@ class Network:
                     if self.network[i].get_endpoint_by_port(port) != self.root_number:
                         self.network[i].drop(port)
 
-    def is_connected_to_root(self, device_number):
+    def is_connected_to_root(self, self_number):
         # checks if device number is connected to root device
-        self.network[device_number].is_connected(self.root_number)
+        return self.network[self_number].is_connected_to(self.root_number)
 
     def dijkstra(self, startpoint, endpoint):
 
