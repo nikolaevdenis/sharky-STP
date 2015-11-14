@@ -1,4 +1,4 @@
-from node import Node
+from .node import Node
 from random import randint
 
 class Network:
@@ -49,31 +49,28 @@ class Network:
         # checks if device number is connected to root device
         return self.network[self_number].is_connected_to(self.root_number)
 
-    def dijkstra(self, startpoint, endpoint):
-
-        network = self.network[:]
+    def dijkstra(self, start_node_number, end_node_number):
         # print ('Starting djikstra for ', startpoint, 'to', endpoint)
-        start_device = network[startpoint]
+        start_node = self.network[start_node_number]
 
+        # Starting Djikstra
         node_list = []
         path_list = []
-        for device in network:
-            # set incredibly length!
+        for device in self.network:
+            # creating node values and empty path
             node_list.append(10000)
             path_list.append('')
-
-        node_list[startpoint] = 0
-        device_number = startpoint
-        depth_level = 0
+        node_list[start_node_number] = 0 # the first node has 0 value
         connection = 0
         last_depth = 0
+
         while 1:
-            must_break = False
-            for device_number, value in enumerate(node_list):
-                if value == depth_level:
-                    if device_number != endpoint:
+            must_break = False # if should break later
+            for node_number, node_value in enumerate(node_list): # looping in nodes
+                if node_value == depth_level: # working only in current depth
+                    if node_number != end_node_number: # if
                         # print ('Current device_number', device_number)
-                        if node_list[device_number] == depth_level:
+                        if node_list[node_number] == depth_level:
                             current_device = network[device_number]
                             current_device_connections = current_device.get_connections()
                             # # print('current_device', str(device_number), 'current_device_connections', str(current_device_connections))

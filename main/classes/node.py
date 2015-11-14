@@ -1,4 +1,4 @@
-from connection import Connection
+from .connection import Connection
 
 class Node:
 
@@ -17,8 +17,8 @@ class Node:
     def __str__(self):
         in_string = 'Commutator #' + str(self.self_number) + '\n'
         for connection in self.connections:
-            in_string += '\troutes to #' + connection.get_connected_to() + \
-                         '\tover port #' + connection.get_port() + '\n'
+            in_string += '\troutes to #' + str(connection.get_connected_to()) + \
+                         '\tover port #' + str(connection.get_port()) + '\n'
         if self.is_root:
             in_string += '\t----ROOT----\n'
         return in_string
@@ -56,6 +56,13 @@ class Node:
         else:
             return False
 
+    def has_port(self, port):
+        for connection in self.connections:
+            if connection.get_port() == port:
+                return True
+        else:
+            return False
+
     def get_self_number(self):
         return self.self_number
 
@@ -65,14 +72,14 @@ class Node:
 
     def drop_by_port(self, port):
         for connection in self.connections:
-            if connection.get_port() == port
+            if connection.get_port() == port:
                 self.connections.remove(connection)
                 return True
         return False
 
     def drop_by_target(self, target):
         for connection in self.connections:
-            if connection.get_connected_to() == target
+            if connection.get_connected_to() == target:
                 self.connections.remove(connection)
                 return True
         return False

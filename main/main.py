@@ -3,8 +3,7 @@ main file handles input and output of the program, also handles main working pro
 """
 
 # imports
-from classes import Network
-from classes import Device
+from classes.network import Network
 
 if __name__=='__main__':
     # print ('--DEBUG--')
