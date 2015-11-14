@@ -38,6 +38,15 @@ class Node:
         else:
             return False
 
+    def get_all_ports(self):
+        ports = []
+        for connection in self.connections:
+            ports.append(connection.get_port())
+        if ports != []:
+            return ports
+        else:
+            return False
+
     def is_connected_to(self, target):
         # checks if the current commutator is connected to target one
 
@@ -54,47 +63,26 @@ class Node:
         self.is_root = True
         self.connections = []
 
-    def get_port_by_endpoint(self, endpoint):
-        # TODO - delete
-        for item in self.data:
-            if item[0] == endpoint:
-                return item[1]
+    def drop_by_port(self, port):
+        for connection in self.connections:
+            if connection.get_port() == port
+                self.connections.remove(connection)
+                return True
         return False
 
-    def get_endpoint_by_port(self, port):
-        for item in self.data:
-            if item[1] == port:
-                return item[0]
+    def drop_by_target(self, target):
+        for connection in self.connections:
+            if connection.get_connected_to() == target
+                self.connections.remove(connection)
+                return True
+        return False
 
-    def get_all_ports(self):
-        return [item[1] for item in self.data]
-
-    def drop(self, port, endpoint = False):
-        # closes the port given
-        if not endpoint:
-            endpoint = self.get_endpoint_by_port(port)
-        # # print ('Kill connection on device #', self.number, 'endpoint:', endpoint, 'port', port)
-        self.data.remove([endpoint, port, False])
-        # try:
-        #     endpoint = self.get_endpoint_by_port(port)
-        #     self.data.remove([endpoint, port, False])
-        # except:
-        #     # print ('Cannot drop port #', port, 'on device #', self.number)
-    def drop_all_by_endpoint(self, endpoint):
-        while len(self.data) > 1:
-            for item in self.data:
-                if item[0] != endpoint:
-                    # print ('Dropping ' + str(item))
-                    self.drop(item[1], item[0])
-
-    def flag_port(self, port):
-        for item in self.data:
-            if item[1] == port:
-                item[2] = True
-                break
+    def flag_connection(self, port):
+        for connection in self.connections:
+            if connection.get_port() == port:
+                connection.set_flag()
 
     def drop_non_root_ports(self):
-        for item in self.data:
-            if not item[2]:
-                # print ('On device ' + str(self.number) + ' Dropping port ' + str(item[1]) + ' Routing to ' + str(item[0]) + ' ' + str(item[2]))
-                self.drop(item[1])
+        for connection in self.connections:
+            if not connection.is_flagged():
+                self.drop_by_port(connection.get_port())

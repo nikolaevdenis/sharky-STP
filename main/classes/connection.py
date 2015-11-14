@@ -25,3 +25,6 @@ class Connection:
 
     def is_flagged(self):
         return self.flag
+
+    def set_flag(self):
+        self.flag = True
