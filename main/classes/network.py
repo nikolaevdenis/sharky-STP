@@ -1,7 +1,4 @@
-"""
-classes file implies all classes, which will be used in current program
-"""
-from random import randint
+import node
 
 class Network:
 
@@ -10,7 +7,7 @@ class Network:
         self.network = []
         self.root_number = None
         for i in range(max):
-            self.network.append(Device(i))
+            self.network.append(Node(i))
             for j in range(max):
                 target = randint(0, max-1)
                 if target != i:
@@ -132,97 +129,3 @@ class Network:
             self.dijkstra(device_number, root)
         # for device in self.network:
         #     device.drop_non_root_ports()
-
-
-class Device:
-
-    def __init__(self, own_number, endpoint = None, port = None, root_flag = False):
-        # commutator is performed as list of tuples (endpoint, port used)
-        # # print("Creating device " + str(own_number) + " with following parameters: ")
-        # # print(endpoint, port, root_flag)
-        if endpoint and port:
-            self.data = [[endpoint, port, root_flag]]
-        else:
-            self.data = []
-        # # print("this device has connections: " + str(self.data))
-        self.number = own_number
-        self.is_root = False
-
-    def append(self, endpoint, port, root_flag):
-        # if connection is unique - add
-        if all(item[0] != endpoint for item in self.data) and all(item[1] != port for item in self.data) and endpoint != self.number:
-            self.data.append([endpoint, port, root_flag])
-
-    def get_connections(self):
-        # returns all connected nodes as destination node numbers
-        return [connection[0] for connection in self.data]
-
-    def __str__(self):
-        in_string = 'Commutator #' + str(self.number) + '\n'
-        for item in self.data:
-            in_string += '\troutes to #' + str(item[0]) + \
-                         '\tover port #' + str(item[1]) + '\n'
-        if self.is_root:
-            in_string += '\t----ROOT----\n'
-        return in_string
-
-    def is_connected(self, endpoint):
-        # checks if the current commutator is connected to endpoint
-        # if yes, returns a connection port
-        # if no, returns False
-        for item in self.data:
-            if item[0] == endpoint:
-                return item[1]
-        else:
-            return False
-
-    def get_own_number(self):
-        return self.number
-
-    def set_root(self):
-        self.is_root = True
-        self.data = []
-
-    def get_port_by_endpoint(self, endpoint):
-        for item in self.data:
-            if item[0] == endpoint:
-                return item[1]
-        return False
-
-    def get_endpoint_by_port(self, port):
-        for item in self.data:
-            if item[1] == port:
-                return item[0]
-
-    def get_all_ports(self):
-        return [item[1] for item in self.data]
-
-    def drop(self, port, endpoint = False):
-        # closes the port given
-        if not endpoint:
-            endpoint = self.get_endpoint_by_port(port)
-        # # print ('Kill connection on device #', self.number, 'endpoint:', endpoint, 'port', port)
-        self.data.remove([endpoint, port, False])
-        # try:
-        #     endpoint = self.get_endpoint_by_port(port)
-        #     self.data.remove([endpoint, port, False])
-        # except:
-        #     # print ('Cannot drop port #', port, 'on device #', self.number)
-    def drop_all_by_endpoint(self, endpoint):
-        while len(self.data) > 1:
-            for item in self.data:
-                if item[0] != endpoint:
-                    # print ('Dropping ' + str(item))
-                    self.drop(item[1], item[0])
-
-    def flag_port(self, port):
-        for item in self.data:
-            if item[1] == port:
-                item[2] = True
-                break
-
-    def drop_non_root_ports(self):
-        for item in self.data:
-            if not item[2]:
-                # print ('On device ' + str(self.number) + ' Dropping port ' + str(item[1]) + ' Routing to ' + str(item[0]) + ' ' + str(item[2]))
-                self.drop(item[1])
