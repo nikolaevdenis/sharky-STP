@@ -95,8 +95,6 @@ class Network:
                                 node_list[current_connection] = node_value + 1
                                 path_list[current_connection] = node_number
 
-                            # drop connections to current device not to go back
-                            self.network[current_connection].drop_by_target(node_number)
                     else:
                         must_break = True
                 if must_break:
@@ -108,28 +106,18 @@ class Network:
         # flagging root connections
         current_path_point = end_node_number
         while current_path_point != start_node_number:
-            # print ('Current device number = ', connection, 'Previous = ', path_list[connection])
             previous_device = path_list[current_path_point]
-            if previous_device != '':
-                # print ('Path point: ' + str(current_path_point))
-                # root_port = self.network[previous_device].get_port_by_endpoint(self.network[connection])
-                # self.network[previous_device].flag_port(root_port)
-                # print ('DROPPING PORTS FOR DEVICE #' + str(previous_device))
-                # self.network[previous_device].drop_non_root_ports()
+            if previous_device != '': # if there is previous on path
                 self.network[previous_device].flag_connection_by_target(current_path_point)
                 current_path_point = previous_device
             else:
                 break
-        # # print ('Path', depth_level)
 
     def STP(self, root_number):
         if self.only_one_component():
             self.network[root_number].set_root()
             for device_number, device in enumerate(self.network):
-                # # print("################## NEW STP ITERATION, DEVICE NUMBER == " + str(device_number))
                 self.dijkstra(device_number, root_number)
-            # for device in self.network:
-            #     device.drop_non_root_ports()
             for node in self.network:
                 node.drop_non_root_ports()
         else:

@@ -20,7 +20,7 @@ def prompt_quantity(default_quantity = 10):
         break
     return option_nodes_quantity
 
-def prompt_root_number(default_root = 5):
+def prompt_root_number(default_root = 0):
     # prompting # of root device
     while 1:
         option_root_number = input('Enter # of root device:\t')
@@ -38,7 +38,7 @@ def prompt_root_number(default_root = 5):
 if __name__=='__main__':
 
     # menu
-    nodes_quantity = prompt_quantity(20)
+    nodes_quantity = prompt_quantity(10)
     root_number = prompt_root_number(0)
 
     # main algorithm
