@@ -15,13 +15,13 @@ class Network:
                 target = randint(0, max-1)
                 if target != i:
                     self.network[i].append(randint(0, max-1), randint(0, max-1), False)
-        # self.network.append(Device(1, 1, 0, False))
+        # self.network.append(Node(1, 1, 0, False))
         # self.network[0].append(2, 2, False)
         # self.network[0].append(3, 3, False)
-        # self.network.append(Device(0, 0, 1, False))
-        # self.network.append(Device(0, 0, 2, False))
-        # self.network.append(Device(0, 0, 3, False))
-        # self.network.append(Device(3, 0, 4, False))
+        # self.network.append(Node(0, 0, 1, False))
+        # self.network.append(Node(0, 0, 2, False))
+        # self.network.append(Node(0, 0, 3, False))
+        # self.network.append(Node(3, 0, 4, False))
         # self.network[3].append(4, 4, False)
         self.reference_network = self.network[:]
 
