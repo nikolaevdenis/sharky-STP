@@ -35,23 +35,11 @@ class Network:
         # closes the port on device
         self.network[self_number].drop_by_port(port)
 
-    def do_things(self):
-        # does the things
-        for i in range(len(self.network)):
-            if self.is_connected_to_root(i) == False:
-                del self.network[i]
-            else:
-                for port in self.network[i].get_all_ports():
-                    if self.network[i].get_endpoint_by_port(port) != self.root_number:
-                        self.network[i].drop(port)
-
     def is_connected_to_root(self, self_number):
         # checks if device number is connected to root device
         return self.network[self_number].is_connected_to(self.root_number)
 
     def dijkstra(self, start_node_number, end_node_number):
-        # print ('Starting djikstra for ', startpoint, 'to', endpoint)
-        start_node = self.network[start_node_number]
 
         # Starting Djikstra
         depth_level = 0
@@ -67,22 +55,19 @@ class Network:
             must_break = False # if should break later
             for node_number, node_value in enumerate(node_list): # looping in nodes
                 if node_value == depth_level: # working only in current depth
+
                     if node_number != end_node_number: # if the path is found
-                        # print ('Current device_number', device_number)
                         current_device = self.network[node_number]
                         current_device_connections = current_device.get_all_connection_targets()
-                        # # print('current_device', str(device_number), 'current_device_connections', str(current_device_connections))
-                        for current_connection in current_device_connections: # for every connection target on current device
+
+                        # for every connection target on current device
+                        for current_connection in current_device_connections:
                             if node_list[current_connection] >= 1 + node_value: # Djikstra
-                                # print ('Found a close one', connection)
                                 node_list[current_connection] = node_value + 1
                                 path_list[current_connection] = node_number
+
                             # drop connections to current device not to go back
-                            # first, get the object of connected device
                             self.network[current_connection].drop_by_target(node_number)
-                            # drop connection to connected device
-                            # # print ('Backwards Connection', connection, 'Connected device port', connected_device_port)
-                            # # print (str(network[device_number]))
                     else:
                         must_break = True
                 if must_break:
@@ -108,10 +93,12 @@ class Network:
                 break
         # # print ('Path', depth_level)
 
-    def STP(self, root):
-        self.network[root].set_root()
+    def STP(self, root_number):
+        self.network[root_number].set_root()
         for device_number, device in enumerate(self.network):
             # # print("################## NEW STP ITERATION, DEVICE NUMBER == " + str(device_number))
-            self.dijkstra(device_number, root)
+            self.dijkstra(device_number, root_number)
         # for device in self.network:
         #     device.drop_non_root_ports()
+        for node in self.network:
+            node.drop_non_root_ports()

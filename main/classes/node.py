@@ -52,7 +52,7 @@ class Node:
 
         for connection in self.connections:
             if connection.get_connected_to() == target:
-                return connection.get_port()
+                return True
         else:
             return False
 
@@ -95,6 +95,8 @@ class Node:
                 connection.set_flag()
 
     def drop_non_root_ports(self):
+        new_connections_list = []
         for connection in self.connections:
-            if not connection.is_flagged():
-                self.drop_by_port(connection.get_port())
+            if connection.is_flagged():
+                new_connections_list.append(connection)
+        self.connections = new_connections_list
