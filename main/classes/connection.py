@@ -1,8 +1,13 @@
 class Connection:
     """
-
+    stores info about connections:
+    - own number of commutator (self.number)
+    - number of connected commutator (self.connected_to)
+    - port of connection (self.port)
+    - if the connection is a 'root' connection (self.flag)
     """
     def __init__(self, self_number, connected_to, port):
+        # create structure
         self.number = self_number
         self.connected_to = connected_to
         self.port = port
@@ -18,6 +23,7 @@ class Connection:
         return self.port
 
     def is_connected_to(self, target):
+        # checks if this connection connects device to target device
         if self.connected_to == target:
             return True
         else:

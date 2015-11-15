@@ -2,7 +2,10 @@ from .node import Node
 from random import randint
 
 class Network:
-
+    """
+    Network is a list of commutators (nodes)
+    This is the high-level class to work with from main algorithm
+    """
     def __init__(self, max):
         # creates random network
         self.network = []
@@ -20,28 +23,54 @@ class Network:
             in_string += str(node) + '\n'
         return in_string
 
-    def is_connected(self, self_number, target):
-        # checks if the startpoint commutator is connected to endpoint
-        # if yes, returns a connection port
-        # if no, returns False
-        return self.network[self_number].is_connected_to(target)
+    def is_connected(self, node_number, target_number):
+        # checks if the commutator is connected to target one
+        return self.network[node_number].is_connected_to(target_number)
 
-    def tag_root(self, self_number):
+    def tag_root(self, node_number):
         # tags the device as root, remember the root device number
-        self.network[self_number].set_root()
-        self.root_number = self_number
+        self.network[node_number].set_root()
+        self.root_number = node_number
 
-    def drop_connection(self, self_number, port):
+    def drop_connection(self, node_number, port):
         # closes the port on device
-        self.network[self_number].drop_by_port(port)
+        self.network[node_number].drop_by_port(port)
 
-    def is_connected_to_root(self, self_number):
+    def is_connected_to_root(self, node_number):
         # checks if device number is connected to root device
-        return self.network[self_number].is_connected_to(self.root_number)
+        return self.network[node_number].is_connected_to(self.root_number)
+
+    def only_one_component(self):
+        # checks if network graph has only one component
+        # goes though the graph from first node and 'visits' every node
+        # then it does the same from other node, as the graph is two-way connected
+        # if after this any node remains unvisited - graph has >1 component
+        # the program cannot run further
+
+        return self.visit_all_from(0) and self.visit_all_from(1)
+
+    def visit_all_from(self, start):
+        # performs 'visiting' nodes in graph
+        # tryes to visit every node
+        # returns True, if all nodes are visited
+        # returns False, if could not visit all nodes
+
+        visited_nodes= [start] # contains numbers of visited nodes
+        connections = self.network[start].get_all_connection_targets()
+        if connections:
+            for current_connection in connections:
+                if not current_connection in visited_nodes:
+                    visited_nodes.append(current_connection)
+                    if type(self.network[current_connection].get_all_connection_targets()) is list:
+                        for new_connection in self.network[current_connection].get_all_connection_targets():
+                            if new_connection not in connections:
+                                connections.append(new_connection)
+
+        return len(visited_nodes) == len(self.network) # if all nodes visited, return True
 
     def dijkstra(self, start_node_number, end_node_number):
-
-        # Starting Djikstra
+        # Dijkstra alghorithm of calculating the shortest path between two nodes.
+        # https://en.wikipedia.org/wiki/Dijkstra's_algorithm
         depth_level = 0
         node_list = []
         path_list = []
@@ -94,11 +123,15 @@ class Network:
         # # print ('Path', depth_level)
 
     def STP(self, root_number):
-        self.network[root_number].set_root()
-        for device_number, device in enumerate(self.network):
-            # # print("################## NEW STP ITERATION, DEVICE NUMBER == " + str(device_number))
-            self.dijkstra(device_number, root_number)
-        # for device in self.network:
-        #     device.drop_non_root_ports()
-        for node in self.network:
-            node.drop_non_root_ports()
+        if self.only_one_component():
+            self.network[root_number].set_root()
+            for device_number, device in enumerate(self.network):
+                # # print("################## NEW STP ITERATION, DEVICE NUMBER == " + str(device_number))
+                self.dijkstra(device_number, root_number)
+            # for device in self.network:
+            #     device.drop_non_root_ports()
+            for node in self.network:
+                node.drop_non_root_ports()
+        else:
+            print('Network topology is invalid')
+            exit()
