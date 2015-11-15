@@ -54,6 +54,7 @@ class Network:
         start_node = self.network[start_node_number]
 
         # Starting Djikstra
+        depth_level = 0
         node_list = []
         path_list = []
         for device in self.network:
@@ -61,52 +62,48 @@ class Network:
             node_list.append(10000)
             path_list.append('')
         node_list[start_node_number] = 0 # the first node has 0 value
-        connection = 0
-        last_depth = 0
 
         while 1:
             must_break = False # if should break later
             for node_number, node_value in enumerate(node_list): # looping in nodes
                 if node_value == depth_level: # working only in current depth
-                    if node_number != end_node_number: # if
+                    if node_number != end_node_number: # if the path is found
                         # print ('Current device_number', device_number)
-                        if node_list[node_number] == depth_level:
-                            current_device = network[device_number]
-                            current_device_connections = current_device.get_connections()
-                            # # print('current_device', str(device_number), 'current_device_connections', str(current_device_connections))
-                            for connection in current_device_connections:
-                                if node_list[connection] >= 1 + node_list[device_number]:
-                                    # print ('Found a close one', connection)
-                                    node_list[connection] = node_list[device_number] + 1
-                                    path_list[connection] = device_number
-                                    last_depth = node_list[connection]
-                                # drop connections to current device not to go back
-                                # first, get the object of connected device
-                                connected_device_port = network[connection].get_port_by_endpoint(device_number)
-                                # drop connection to connected device
-                                # # print ('Backwards Connection', connection, 'Connected device port', connected_device_port)
-                                if connected_device_port:
-                                    network[connection].drop(connected_device_port)
-                                # # print (str(network[device_number]))
+                        current_device = self.network[node_number]
+                        current_device_connections = current_device.get_all_connection_targets()
+                        # # print('current_device', str(device_number), 'current_device_connections', str(current_device_connections))
+                        for current_connection in current_device_connections: # for every connection target on current device
+                            if node_list[current_connection] >= 1 + node_value: # Djikstra
+                                # print ('Found a close one', connection)
+                                node_list[current_connection] = node_value + 1
+                                path_list[current_connection] = node_number
+                            # drop connections to current device not to go back
+                            # first, get the object of connected device
+                            self.network[current_connection].drop_by_target(node_number)
+                            # drop connection to connected device
+                            # # print ('Backwards Connection', connection, 'Connected device port', connected_device_port)
+                            # # print (str(network[device_number]))
                     else:
                         must_break = True
                 if must_break:
                     break
             if must_break:
                 break
-            depth_level = last_depth
-        connection = endpoint
+            depth_level += 1
 
-        while connection != startpoint:
-            # # print ('Current device number = ', connection, 'Previous = ', path_list[connection])
-            previous_device = path_list[connection]
+        # flagging root connections
+        current_path_point = end_node_number
+        while current_path_point != start_node_number:
+            # print ('Current device number = ', connection, 'Previous = ', path_list[connection])
+            previous_device = path_list[current_path_point]
             if previous_device != '':
+                # print ('Path point: ' + str(current_path_point))
                 # root_port = self.network[previous_device].get_port_by_endpoint(self.network[connection])
                 # self.network[previous_device].flag_port(root_port)
                 # print ('DROPPING PORTS FOR DEVICE #' + str(previous_device))
                 # self.network[previous_device].drop_non_root_ports()
-                self.network[previous_device].drop_all_by_endpoint(connection)
-                connection = previous_device
+                self.network[previous_device].flag_connection_by_target(current_path_point)
+                current_path_point = previous_device
             else:
                 break
         # # print ('Path', depth_level)

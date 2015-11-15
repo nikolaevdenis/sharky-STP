@@ -84,9 +84,14 @@ class Node:
                 return True
         return False
 
-    def flag_connection(self, port):
+    def flag_connection_by_port(self, port):
         for connection in self.connections:
             if connection.get_port() == port:
+                connection.set_flag()
+
+    def flag_connection_by_target(self, target):
+        for connection in self.connections:
+            if connection.get_connected_to() == target:
                 connection.set_flag()
 
     def drop_non_root_ports(self):
